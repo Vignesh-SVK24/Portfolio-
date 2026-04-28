@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vignesh's Portfolio — Creative Developer & Designer showcasing web projects, skills, and experience.">
+    <title>Vignesh | Portfolio</title>
+
+    <!-- ======== SECURITY HEADERS ======== -->
+    <!-- Content Security Policy: restrict resource origins to prevent XSS -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self';
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+        font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+        img-src 'self' data:;
+        connect-src 'self';
+        frame-src 'none';
+        object-src 'none';
+        base-uri 'self';
+        form-action 'self';
+    ">
+    <!-- Prevent clickjacking by disallowing iframe embedding -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <!-- Prevent MIME type sniffing -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <!-- Control referrer information leakage -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <!-- Disable browser features not needed by this site -->
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
+
+    <!-- ======== EXTERNAL RESOURCES WITH SRI ======== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- ======== PRELOADER ======== -->
+    <div id="preloader">
+        <div class="loader">
+            <span class="loader-text">V</span>
+            <div class="loader-bar"></div>
+        </div>
+    </div>
+
+    <!-- ======== CURSOR ======== -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursor-follower"></div>
+
+    <!-- ======== HERO SECTION (Image 1 Style) ======== -->
+    <section id="hero" class="hero-section">
+        <div class="hero-bg">
+            <img src="assets/images/hero-bg.png" alt="Scenic background" class="hero-bg-img">
+            <div class="hero-overlay"></div>
+        </div>
+
+        <!-- Side Navigation -->
+        <nav class="side-nav" id="sideNav">
+            <div class="logo">
+                <span class="logo-icon"><i class="fas fa-code"></i></span>
+                <span class="logo-text">vignesh</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#hero" class="nav-link active" data-section="hero">HOME</a></li>
+                <li><a href="#about" class="nav-link" data-section="about">ABOUT</a></li>
+                <li><a href="#background" class="nav-link" data-section="background">BACKGROUND</a></li>
+                <li><a href="#projects" class="nav-link" data-section="projects">PROJECTS</a></li>
+                <li><a href="#contact" class="nav-link" data-section="contact">CONTACT</a></li>
+            </ul>
+            <div class="social-icons">
+                <a href="#" aria-label="Twitter" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>
+                <a href="https://www.instagram.com/vignesh_svk24?igsh=MWJjdjZydDV1OWg3ag==" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                <a href="https://github.com/Vignesh-SVK24" aria-label="GitHub" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/vignesh-s-442081373?utm_source=share_via&utm_content=profile&utm_medium=member_android" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </nav>
+
+        <!-- Mobile Nav Toggle -->
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <!-- Hero Content -->
+        <div class="hero-content">
+            <div class="hero-text-block">
+                <p class="hero-greeting" data-animate="fade-up">Welcome to</p>
+                <h1 class="hero-title" data-animate="fade-up" data-delay="0.2">
+                    <span class="title-line">PORT</span>
+                    <span class="title-line">FOLIO</span>
+                </h1>
+                <p class="hero-subtitle" data-animate="fade-up" data-delay="0.4">
+                    Web Developer & Creative Designer — Building digital experiences that leave a mark.
+                </p>
+                <a href="#projects" class="hero-cta" data-animate="fade-up" data-delay="0.6">
+                    <span>VIEW WORK</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="hero-portrait" data-animate="fade-left" data-delay="0.3">
+                <img src="assets/images/hero-portrait.jpg" alt="Vignesh portrait">
+            </div>
+        </div>
+
+        <!-- Scroll Dots -->
+        <div class="scroll-dots">
+            <span class="dot active" data-target="hero"></span>
+            <span class="dot" data-target="about"></span>
+            <span class="dot" data-target="background"></span>
+            <span class="dot" data-target="projects"></span>
+            <span class="dot" data-target="more-work"></span>
+            <span class="dot" data-target="contact"></span>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="scroll-indicator">
+            <div class="scroll-line"></div>
+            <span>Scroll</span>
+        </div>
+    </section>
+
+    <!-- ======== ABOUT SECTION (Image 2 - "Who is Chad?" style) ======== -->
+    <section id="about" class="section about-section">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-text" data-animate="fade-right">
+                    <h2 class="section-title cursive-title">Who is Vignesh?</h2>
+                    <p class="about-description">
+                        I'm a creative developer with a passion for building beautiful, functional websites. 
+                        I specialize in crafting digital experiences that combine stunning visuals with 
+                        seamless user interactions. Every project is an opportunity to push boundaries 
+                        and create something extraordinary.
+                    </p>
+                    <div class="about-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" data-count="10">0</span><span class="stat-plus">+</span>
+                            <span class="stat-label">Projects</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" data-count="2">0</span><span class="stat-plus">+</span>
+                            <span class="stat-label">Years Experience</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" data-count="5">0</span><span class="stat-plus">+</span>
+                            <span class="stat-label">Technologies</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image" data-animate="fade-left">
+                    <div class="image-frame">
+                        <img src="assets/images/about-photo.jpg" alt="About Vignesh">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== BACKGROUND SECTION (Image 2 - "My Background" style) ======== -->
+    <section id="background" class="section background-section">
+        <div class="container">
+            <h2 class="section-title" data-animate="fade-up">My Background</h2>
+            <div class="timeline">
+                <div class="timeline-item" data-animate="fade-up" data-delay="0.1">
+                    <div class="timeline-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Education</h3>
+                        <ul>
+                            <li>B.Tech in Artificial Intelligence & Machine Learning</li>
+                            <li>Self learning using AI</li>
+                            <li>AI Tool Explorer</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item" data-animate="fade-up" data-delay="0.2">
+                    <div class="timeline-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Skills & Technologies</h3>
+                        <div class="skills-grid">
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">HTML</span>
+                            <span class="skill-tag">CSS</span>
+                            <span class="skill-tag">JavaScript</span>
+                            <span class="skill-tag">Git</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item" data-animate="fade-up" data-delay="0.3">
+                    <div class="timeline-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>What I Do</h3>
+                        <ul>
+                            <li>Coding using AI tools</li>
+                            <li>Full Stack Developer</li>
+                            <li>Interactive UI/UX Design</li>
+                            <li>Game Development</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== PROJECTS SECTION (Image 2 - "My Art" style) ======== -->
+    <section id="projects" class="section projects-section">
+        <div class="container">
+            <h2 class="section-title cursive-title" data-animate="fade-up">My Projects</h2>
+            <div class="projects-grid" data-animate="fade-up" data-delay="0.2">
+                <!-- Project 1 -->
+                <div class="project-card" id="project-1">
+                    <div class="project-image">
+                        <img src="assets/images/mystery-word.jpg" alt="Mystery Word Game Logo">
+                        <div class="project-overlay">
+                            <a href="https://svk-mystery-word-game.onrender.com" class="project-link" target="_blank" rel="noopener noreferrer" data-project="1">
+                                <i class="fas fa-external-link-alt"></i>
+                                <span>Visit Live Site</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="project-info">
+                        <h3>Mystery Word Game</h3>
+                        <p>A real-time multiplayer word guessing game built with Socket.io</p>
+                        <div class="project-tags">
+                            <span>Node.js</span>
+                            <span>Socket.io</span>
+                            <span>JavaScript</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card" id="project-2">
+                    <div class="project-image">
+                        <img src="assets/images/project-2.png" alt="Project 2">
+                        <div class="project-overlay">
+                            <a href="#" class="project-link" target="_blank" rel="noopener noreferrer" data-project="2">
+                                <i class="fas fa-external-link-alt"></i>
+                                <span>Visit Live Site</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="project-info">
+                        <h3>AI Design Tool</h3>
+                        <p>A generative AI-powered design platform inspired by Canva</p>
+                        <div class="project-tags">
+                            <span>React</span>
+                            <span>FastAPI</span>
+                            <span>AI/ML</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="project-card" id="project-3">
+                    <div class="project-image">
+                        <img src="assets/images/airdraw.jpg" alt="Project 3">
+                        <div class="project-overlay">
+                            <a href="#" class="project-link" target="_blank" rel="noopener noreferrer" data-project="3">
+                                <i class="fas fa-external-link-alt"></i>
+                                <span>Visit Live Site</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="project-info">
+                        <h3>AirDraw 3D</h3>
+                        <p>A 3D hand-gesture drawing application with MediaPipe tracking</p>
+                        <div class="project-tags">
+                            <span>Three.js</span>
+                            <span>MediaPipe</span>
+                            <span>WebGL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== QUOTE SECTION (Image 2 style) ======== -->
+    <section class="section quote-section">
+        <div class="container">
+            <blockquote class="featured-quote" data-animate="fade-up">
+                <p>Code speaks where<br>words are unable<br>to explain.</p>
+            </blockquote>
+        </div>
+    </section>
+
+    <!-- ======== MORE WORK SECTION (Image 2 - "More of My Work" style) ======== -->
+    <section id="more-work" class="section more-work-section">
+        <div class="container">
+            <h2 class="section-title cursive-title" data-animate="fade-up">More of My Work</h2>
+            <div class="more-work-grid" data-animate="fade-up" data-delay="0.2">
+                <div class="work-card" id="work-4">
+                    <div class="work-image">
+                        <img src="assets/images/mystery-word.jpg" alt="Mystery Word Game">
+                    </div>
+                    <div class="work-info">
+                        <h4>Suspects: Mystery Mansion</h4>
+                        <p>Interactive detective game</p>
+                        <a href="https://svk-mystery-word-game.onrender.com" class="work-link" target="_blank" rel="noopener noreferrer">
+                            Visit <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="work-card" id="work-5">
+                    <div class="work-image">
+                        <img src="assets/images/project-2.png" alt="Portfolio Website">
+                    </div>
+                    <div class="work-info">
+                        <h4>Creative Portfolio</h4>
+                        <p>Personal portfolio website</p>
+                        <a href="#" class="work-link" target="_blank" rel="noopener noreferrer">
+                            Visit <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="work-card" id="work-6">
+                    <div class="work-image">
+                        <img src="assets/images/project-3.png" alt="E-commerce">
+                    </div>
+                    <div class="work-info">
+                        <h4>E-Commerce Platform</h4>
+                        <p>Modern online store</p>
+                        <a href="#" class="work-link" target="_blank" rel="noopener noreferrer">
+                            Visit <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== CONTACT SECTION (Image 2 - "Reach Out to Me" style) ======== -->
+    <section id="contact" class="section contact-section">
+        <div class="container">
+            <h2 class="section-title cursive-title" data-animate="fade-up">Reach Out<br>to Me</h2>
+            <div class="contact-grid" data-animate="fade-up" data-delay="0.2">
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <h4>Address</h4>
+                    <p>Tamil Nadu, India</p>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                    <h4>Email</h4>
+                    <p class="email-protected" data-user="vignesh" data-domain="example.com">Loading...</p>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                    <h4>Phone</h4>
+                    <p>+91 XXXXX XXXXX</p>
+                </div>
+            </div>
+            <div class="contact-cta" data-animate="fade-up" data-delay="0.4">
+                <a href="#" class="collab-btn" id="collabBtn" onclick="window.location.href='mai'+'lto:'+'vignesh'+'@'+'example.com'; return false;">
+                    <i class="fas fa-handshake"></i>
+                    <span>Let's collaborate</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======== FOOTER ======== -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Vignesh. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
