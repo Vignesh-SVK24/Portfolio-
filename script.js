@@ -223,8 +223,8 @@ function initThreeScene() {
 
     // --- Scene, Camera & Renderer ---
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 3500);
-    camera.position.z = 650;
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 3000);
+    camera.position.z = 700;
 
     const renderer = new THREE.WebGLRenderer({
         canvas: canvas,
@@ -233,44 +233,39 @@ function initThreeScene() {
         powerPreference: 'high-performance'
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
     // --- Dynamic 3D Lights ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
     scene.add(ambientLight);
 
-    const cyanLight = new THREE.PointLight(0x00f2fe, 3.2, 1600);
-    cyanLight.position.set(300, 250, 400);
+    const cyanLight = new THREE.PointLight(0x00f2fe, 1.8, 1200);
+    cyanLight.position.set(200, 200, 300);
     scene.add(cyanLight);
 
-    const goldLight = new THREE.PointLight(0xd4af37, 2.5, 1400);
-    goldLight.position.set(-350, -150, 350);
+    const goldLight = new THREE.PointLight(0xd4af37, 1.4, 1000);
+    goldLight.position.set(-250, -100, 250);
     scene.add(goldLight);
 
-    const purpleLight = new THREE.PointLight(0x9d4edd, 2.2, 1600);
-    purpleLight.position.set(0, -600, 450);
-    scene.add(purpleLight);
-
-    // --- 3D Particle Starfield & Cyber Dust ---
+    // --- 3D Ambient Particle Constellation ---
     const isMobile = window.innerWidth < 768;
-    const particleCount = isMobile ? 650 : 1300;
+    const particleCount = isMobile ? 350 : 750;
     const particleGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
     const particleData = [];
 
     const colorPalette = [
-        new THREE.Color(0x8ecae6), // Ice blue
+        new THREE.Color(0x8ecae6), // Soft sky blue
         new THREE.Color(0x00f2fe), // Electric Cyan
-        new THREE.Color(0xd4af37), // Celestial Gold
-        new THREE.Color(0x9d4edd), // Neon Purple
-        new THREE.Color(0xffffff)  // Pure Starlight
+        new THREE.Color(0xffffff), // Pure Starlight
+        new THREE.Color(0xd4af37)  // Subtle Gold
     ];
 
     for (let i = 0; i < particleCount; i++) {
-        const x = (Math.random() - 0.5) * 2400;
-        const y = (Math.random() - 0.5) * 3800;
-        const z = (Math.random() - 0.5) * 1600;
+        const x = (Math.random() - 0.5) * 2000;
+        const y = (Math.random() - 0.5) * 3200;
+        const z = (Math.random() - 0.5) * 1200;
         positions[i * 3] = x;
         positions[i * 3 + 1] = y;
         positions[i * 3 + 2] = z;
@@ -278,10 +273,9 @@ function initThreeScene() {
         particleData.push({
             originX: x,
             originY: y,
-            originZ: z,
-            speed: 0.2 + Math.random() * 0.7,
+            speed: 0.15 + Math.random() * 0.45,
             phase: Math.random() * Math.PI * 2,
-            radius: 12 + Math.random() * 32
+            radius: 8 + Math.random() * 18
         });
 
         const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
@@ -293,15 +287,15 @@ function initThreeScene() {
     particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-    // Dynamic glowing circular particle texture
+    // Crisp soft particle texture
     const pCanvas = document.createElement('canvas');
     pCanvas.width = 32;
     pCanvas.height = 32;
     const pCtx = pCanvas.getContext('2d');
     const radGrad = pCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
     radGrad.addColorStop(0, 'rgba(255,255,255,1)');
-    radGrad.addColorStop(0.3, 'rgba(142,202,230,0.85)');
-    radGrad.addColorStop(0.7, 'rgba(0,242,254,0.3)');
+    radGrad.addColorStop(0.3, 'rgba(142,202,230,0.8)');
+    radGrad.addColorStop(0.7, 'rgba(0,242,254,0.25)');
     radGrad.addColorStop(1, 'rgba(0,0,0,0)');
     pCtx.fillStyle = radGrad;
     pCtx.beginPath();
@@ -310,157 +304,17 @@ function initThreeScene() {
     const particleTex = new THREE.CanvasTexture(pCanvas);
 
     const particleMat = new THREE.PointsMaterial({
-        size: isMobile ? 4.0 : 5.5,
+        size: isMobile ? 3.5 : 4.5,
         map: particleTex,
         vertexColors: true,
         transparent: true,
-        opacity: 0.85,
+        opacity: 0.75,
         blending: THREE.AdditiveBlending,
         depthWrite: false
     });
 
     const starParticles = new THREE.Points(particleGeo, particleMat);
     scene.add(starParticles);
-
-    // --- 3D Geometric Polyhedra & Floating Crystals ---
-    const floatingObjects = [];
-
-    // 1. Hero Holographic Core (Icosahedron + Octahedron + Ring)
-    const heroCoreGroup = new THREE.Group();
-    heroCoreGroup.position.set(isMobile ? 0 : 270, 60, 40);
-
-    const outerIcosaGeo = new THREE.IcosahedronGeometry(isMobile ? 70 : 95, 1);
-    const outerIcosaMat = new THREE.MeshStandardMaterial({
-        color: 0x8ecae6,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.45,
-        roughness: 0.2,
-        metalness: 0.85
-    });
-    const outerIcosa = new THREE.Mesh(outerIcosaGeo, outerIcosaMat);
-    heroCoreGroup.add(outerIcosa);
-
-    const innerOctaGeo = new THREE.OctahedronGeometry(isMobile ? 42 : 55, 0);
-    const innerOctaMat = new THREE.MeshStandardMaterial({
-        color: 0xd4af37,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.65,
-        roughness: 0.3,
-        metalness: 0.9
-    });
-    const innerOcta = new THREE.Mesh(innerOctaGeo, innerOctaMat);
-    heroCoreGroup.add(innerOcta);
-
-    const ringGeo = new THREE.TorusGeometry(isMobile ? 95 : 130, 1.2, 16, 100);
-    const ringMat = new THREE.MeshBasicMaterial({
-        color: 0x00f2fe,
-        transparent: true,
-        opacity: 0.35
-    });
-    const orbitalRing = new THREE.Mesh(ringGeo, ringMat);
-    orbitalRing.rotation.x = Math.PI / 3;
-    heroCoreGroup.add(orbitalRing);
-
-    scene.add(heroCoreGroup);
-    floatingObjects.push({ mesh: heroCoreGroup, rotX: 0.005, rotY: 0.008, rotZ: 0.002, baseY: 60 });
-
-    // 2. About Section: Dodecahedron
-    const dodecaGeo = new THREE.DodecahedronGeometry(60, 0);
-    const dodecaMat = new THREE.MeshStandardMaterial({
-        color: 0x00f2fe,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.4
-    });
-    const dodeca = new THREE.Mesh(dodecaGeo, dodecaMat);
-    dodeca.position.set(-360, -550, 60);
-    scene.add(dodeca);
-    floatingObjects.push({ mesh: dodeca, rotX: 0.006, rotY: 0.009, rotZ: 0.004, baseY: -550 });
-
-    // 3. Projects Section: Torus Knot
-    const knotGeo = new THREE.TorusKnotGeometry(55, 12, 100, 16);
-    const knotMat = new THREE.MeshStandardMaterial({
-        color: 0x9d4edd,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.42
-    });
-    const knot = new THREE.Mesh(knotGeo, knotMat);
-    knot.position.set(380, -1250, 40);
-    scene.add(knot);
-    floatingObjects.push({ mesh: knot, rotX: 0.007, rotY: 0.005, rotZ: 0.003, baseY: -1250 });
-
-    // 4. Background Section: Octahedron
-    const octGeo2 = new THREE.OctahedronGeometry(50, 0);
-    const octMat2 = new THREE.MeshStandardMaterial({
-        color: 0xd4af37,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.5
-    });
-    const oct2 = new THREE.Mesh(octGeo2, octMat2);
-    oct2.position.set(-320, -1900, 50);
-    scene.add(oct2);
-    floatingObjects.push({ mesh: oct2, rotX: 0.008, rotY: 0.006, rotZ: 0.005, baseY: -1900 });
-
-    // 5. Contact Section: Floating Tetrahedron
-    const tetraGeo = new THREE.TetrahedronGeometry(45, 0);
-    const tetraMat = new THREE.MeshStandardMaterial({
-        color: 0x8ecae6,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.45
-    });
-    const tetra = new THREE.Mesh(tetraGeo, tetraMat);
-    tetra.position.set(300, -2600, 70);
-    scene.add(tetra);
-    floatingObjects.push({ mesh: tetra, rotX: 0.009, rotY: 0.007, rotZ: 0.004, baseY: -2600 });
-
-    // --- Interactive 3D Click Shockwave System ---
-    const shockwaves = [];
-    window.addEventListener('click', (e) => {
-        const mouseNormX = (e.clientX / window.innerWidth) * 2 - 1;
-        const mouseNormY = -(e.clientY / window.innerHeight) * 2 + 1;
-
-        const shockCount = 36;
-        const shockGeo = new THREE.BufferGeometry();
-        const shockPos = new Float32Array(shockCount * 3);
-        const velocities = [];
-
-        const clickWorldX = mouseNormX * (camera.position.z * Math.tan(camera.fov * Math.PI / 360)) * camera.aspect;
-        const clickWorldY = camera.position.y + mouseNormY * (camera.position.z * Math.tan(camera.fov * Math.PI / 360));
-
-        for (let i = 0; i < shockCount; i++) {
-            shockPos[i * 3] = clickWorldX;
-            shockPos[i * 3 + 1] = clickWorldY;
-            shockPos[i * 3 + 2] = 200;
-
-            const angle = (i / shockCount) * Math.PI * 2;
-            const speed = 4 + Math.random() * 3;
-            velocities.push({
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                vz: (Math.random() - 0.5) * 2
-            });
-        }
-
-        shockGeo.setAttribute('position', new THREE.BufferAttribute(shockPos, 3));
-        const shockMat = new THREE.PointsMaterial({
-            size: 6.0,
-            map: particleTex,
-            color: new THREE.Color(0x00f2fe),
-            transparent: true,
-            opacity: 1.0,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false
-        });
-
-        const shockPoints = new THREE.Points(shockGeo, shockMat);
-        scene.add(shockPoints);
-        shockwaves.push({ points: shockPoints, velocities, age: 0, maxAge: 45 });
-    });
 
     // --- Mouse Parallax & Scroll Physics ---
     let targetMouseX = 0, targetMouseY = 0;
@@ -471,14 +325,7 @@ function initThreeScene() {
         targetMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
     });
 
-    window.addEventListener('touchmove', (e) => {
-        if (e.touches.length > 0) {
-            targetMouseX = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
-            targetMouseY = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
-        }
-    }, { passive: true });
-
-    // Handle Window Resizing
+    // Resize Handler
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
@@ -501,20 +348,20 @@ function initThreeScene() {
         const elapsedTime = clock.getElapsedTime();
 
         // Smooth mouse damping
-        smoothMouseX += (targetMouseX - smoothMouseX) * 0.05;
-        smoothMouseY += (targetMouseY - smoothMouseY) * 0.05;
+        smoothMouseX += (targetMouseX - smoothMouseX) * 0.04;
+        smoothMouseY += (targetMouseY - smoothMouseY) * 0.04;
 
-        // Camera scroll & mouse parallax
+        // Camera scroll tracking
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
         const scrollFrac = maxScroll > 0 ? window.scrollY / maxScroll : 0;
-        const targetCamY = -scrollFrac * 2700;
+        const targetCamY = -scrollFrac * 2000;
 
-        camera.position.x += (smoothMouseX * 120 - camera.position.x) * 0.05;
-        camera.position.y += (targetCamY + smoothMouseY * 80 - camera.position.y) * 0.06;
-        camera.rotation.y = -smoothMouseX * 0.08;
-        camera.rotation.x = smoothMouseY * 0.08;
+        camera.position.x += (smoothMouseX * 60 - camera.position.x) * 0.04;
+        camera.position.y += (targetCamY + smoothMouseY * 40 - camera.position.y) * 0.05;
+        camera.rotation.y = -smoothMouseX * 0.04;
+        camera.rotation.x = smoothMouseY * 0.04;
 
-        // Update star particles (gentle drift and oscillation)
+        // Gentle particle motion
         const posAttr = starParticles.geometry.attributes.position;
         const posArray = posAttr.array;
         for (let i = 0; i < particleCount; i++) {
@@ -523,46 +370,7 @@ function initThreeScene() {
             posArray[i * 3] = data.originX + Math.cos(elapsedTime * (data.speed * 0.5) + data.phase) * (data.radius * 0.5);
         }
         posAttr.needsUpdate = true;
-        starParticles.rotation.y = elapsedTime * 0.015;
-
-        // Rotate & bob floating 3D polyhedra
-        floatingObjects.forEach((obj, idx) => {
-            obj.mesh.rotation.x += obj.rotX;
-            obj.mesh.rotation.y += obj.rotY;
-            obj.mesh.rotation.z += obj.rotZ;
-            obj.mesh.position.y = obj.baseY + Math.sin(elapsedTime * 1.5 + idx) * 18;
-        });
-
-        // Orbit Hero ring specifically
-        orbitalRing.rotation.z += 0.012;
-        innerOcta.rotation.x -= 0.01;
-        innerOcta.rotation.y -= 0.012;
-
-        // Update shockwaves
-        for (let s = shockwaves.length - 1; s >= 0; s--) {
-            const sw = shockwaves[s];
-            sw.age++;
-            const sPos = sw.points.geometry.attributes.position.array;
-            for (let p = 0; p < sw.velocities.length; p++) {
-                sPos[p * 3] += sw.velocities[p].vx;
-                sPos[p * 3 + 1] += sw.velocities[p].vy;
-                sPos[p * 3 + 2] += sw.velocities[p].vz;
-            }
-            sw.points.geometry.attributes.position.needsUpdate = true;
-            sw.points.material.opacity = 1 - (sw.age / sw.maxAge);
-
-            if (sw.age >= sw.maxAge) {
-                scene.remove(sw.points);
-                sw.points.geometry.dispose();
-                sw.points.material.dispose();
-                shockwaves.splice(s, 1);
-            }
-        }
-
-        // Move light positions slightly for dynamic specular shifts
-        cyanLight.position.x = Math.sin(elapsedTime * 0.7) * 350 + 200;
-        cyanLight.position.y = Math.cos(elapsedTime * 0.5) * 200 + camera.position.y;
-        goldLight.position.y = camera.position.y - 200 + Math.sin(elapsedTime * 0.6) * 150;
+        starParticles.rotation.y = elapsedTime * 0.01;
 
         renderer.render(scene, camera);
     }
@@ -570,58 +378,7 @@ function initThreeScene() {
     render3D();
 }
 
-// ==========================================
-// ===== 3D CARD TILT & GLARE PHYSICS =====
-// ==========================================
-
-function init3DCardTilt() {
-    const tiltElements = document.querySelectorAll('.project-card, .work-card, .hero-portrait, .image-frame, .stat-item, .contact-item');
-    if (!tiltElements.length) return;
-
-    tiltElements.forEach(card => {
-        // Inject 3D glare highlight if not present
-        if (!card.querySelector('.card-glare') && (card.classList.contains('project-card') || card.classList.contains('work-card'))) {
-            const glare = document.createElement('div');
-            glare.className = 'card-glare';
-            card.appendChild(glare);
-        }
-
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            const rotateX = ((y - centerY) / centerY) * -12; // Max 12 deg tilt
-            const rotateY = ((x - centerX) / centerX) * 12;
-
-            card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.03, 1.03, 1.03)`;
-
-            // Update glare position
-            const glare = card.querySelector('.card-glare');
-            if (glare) {
-                const glareX = (x / rect.width) * 100;
-                const glareY = (y / rect.height) * 100;
-                card.style.setProperty('--glare-x', `${glareX}%`);
-                card.style.setProperty('--glare-y', `${glareY}%`);
-            }
-        });
-
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-            card.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
-        });
-
-        card.addEventListener('mouseenter', () => {
-            card.style.transition = 'transform 0.15s ease-out';
-        });
-    });
-}
-
 // Initialize 3D Engine on window load
 window.addEventListener('DOMContentLoaded', () => {
     initThreeScene();
-    init3DCardTilt();
 });
