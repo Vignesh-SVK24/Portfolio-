@@ -247,8 +247,82 @@ function initThreeScene() {
     goldLight.position.set(-250, -100, 250);
     scene.add(goldLight);
 
+    // --- 3D Floating Holographic Geometric Elements ---
+    const floatingGroup = new THREE.Group();
+    scene.add(floatingGroup);
+
+    // 1. Hero 3D Crystal & Gyroscope
+    const crystalGroup = new THREE.Group();
+    const icoGeo = new THREE.IcosahedronGeometry(isMobile ? 50 : 70, 1);
+    const icoEdges = new THREE.EdgesGeometry(icoGeo);
+    const icoLine = new THREE.LineSegments(
+        icoEdges,
+        new THREE.LineBasicMaterial({ color: 0x00f2fe, transparent: true, opacity: 0.45 })
+    );
+    const innerGeo = new THREE.IcosahedronGeometry(isMobile ? 40 : 55, 0);
+    const innerMat = new THREE.MeshPhongMaterial({
+        color: 0x071e33,
+        emissive: 0x00f2fe,
+        emissiveIntensity: 0.22,
+        transparent: true,
+        opacity: 0.65,
+        shininess: 90
+    });
+    const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+    crystalGroup.add(innerMesh);
+    crystalGroup.add(icoLine);
+
+    const ringGeo = new THREE.TorusGeometry(isMobile ? 75 : 105, 1.8, 16, 80);
+    const ringMat = new THREE.MeshBasicMaterial({
+        color: 0x8ecae6,
+        transparent: true,
+        opacity: 0.38,
+        wireframe: true
+    });
+    const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+    ringMesh.rotation.x = Math.PI / 3;
+    crystalGroup.add(ringMesh);
+
+    crystalGroup.position.set(isMobile ? 120 : 340, 140, -80);
+    floatingGroup.add(crystalGroup);
+
+    // 2. Satellite Octahedron (About/Background margin)
+    const satGroup = new THREE.Group();
+    const octGeo = new THREE.OctahedronGeometry(isMobile ? 38 : 52, 0);
+    const octEdges = new THREE.EdgesGeometry(octGeo);
+    const octLine = new THREE.LineSegments(
+        octEdges,
+        new THREE.LineBasicMaterial({ color: 0xd4af37, transparent: true, opacity: 0.42 })
+    );
+    const octCore = new THREE.Mesh(
+        new THREE.OctahedronGeometry(isMobile ? 28 : 40, 0),
+        new THREE.MeshPhongMaterial({
+            color: 0x1f1604,
+            emissive: 0xd4af37,
+            emissiveIntensity: 0.25,
+            transparent: true,
+            opacity: 0.7
+        })
+    );
+    satGroup.add(octCore);
+    satGroup.add(octLine);
+    satGroup.position.set(isMobile ? -140 : -360, -680, -140);
+    floatingGroup.add(satGroup);
+
+    // 3. Projects Torus Knot (Projects margin)
+    const tkGeo = new THREE.TorusKnotGeometry(isMobile ? 32 : 48, 10, 64, 16);
+    const tkMat = new THREE.MeshStandardMaterial({
+        color: 0x00f2fe,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.32,
+        roughness: 0.3
+    });
+    const tkMesh = new THREE.Mesh(tkGeo, tkMat);
+    tkMesh.position.set(isMobile ? 130 : 380, -1500, -110);
+    floatingGroup.add(tkMesh);
+
     // --- 3D Ambient Particle Constellation ---
-    const isMobile = window.innerWidth < 768;
     const particleCount = isMobile ? 350 : 750;
     const particleGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
@@ -361,6 +435,25 @@ function initThreeScene() {
         camera.rotation.y = -smoothMouseX * 0.04;
         camera.rotation.x = smoothMouseY * 0.04;
 
+        // Interactive 3D Cursor Point Light
+        cyanLight.position.x = smoothMouseX * 450;
+        cyanLight.position.y = camera.position.y + smoothMouseY * 350;
+        cyanLight.position.z = 250 + Math.sin(elapsedTime * 2) * 40;
+
+        // Floating 3D Geometries Animations
+        crystalGroup.rotation.x = elapsedTime * 0.22;
+        crystalGroup.rotation.y = elapsedTime * 0.32;
+        ringMesh.rotation.z = -elapsedTime * 0.45;
+        crystalGroup.position.y = 140 + Math.sin(elapsedTime * 1.1) * 18;
+
+        satGroup.rotation.x = -elapsedTime * 0.28;
+        satGroup.rotation.y = elapsedTime * 0.36;
+        satGroup.position.y = -680 + Math.cos(elapsedTime * 0.95) * 16;
+
+        tkMesh.rotation.x = elapsedTime * 0.18;
+        tkMesh.rotation.y = elapsedTime * 0.26;
+        tkMesh.position.y = -1500 + Math.sin(elapsedTime * 0.85) * 20;
+
         // Gentle particle motion
         const posAttr = starParticles.geometry.attributes.position;
         const posArray = posAttr.array;
@@ -378,7 +471,77 @@ function initThreeScene() {
     render3D();
 }
 
+// ===== 3D CARD INTERACTIVE TILT & SPECULAR SHEEN =====
+function initCard3DTilt() {
+    if (window.innerWidth < 768) return; // Touch devices keep standard smooth performance
+
+    const tiltCards = document.querySelectorAll('.project-card, .work-card');
+
+    tiltCards.forEach(card => {
+        let glare = card.querySelector('.card-3d-glare');
+        if (!glare) {
+            glare = document.createElement('div');
+            glare.className = 'card-3d-glare';
+            card.appendChild(glare);
+        }
+
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = ((y - centerY) / centerY) * -10;
+            const rotateY = ((x - centerX) / centerX) * 10;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-8px) scale3d(1.02, 1.02, 1.02)`;
+
+            const glareX = (x / rect.width) * 100;
+            const glareY = (y / rect.height) * 100;
+            glare.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 65%)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0) scale3d(1, 1, 1)';
+            card.style.transition = 'transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.35s, box-shadow 0.35s';
+        });
+
+        card.addEventListener('mouseenter', () => {
+            card.style.transition = 'none';
+        });
+    });
+}
+
+// ===== HERO PORTRAIT 3D PARALLAX TILT =====
+function initHero3DParallax() {
+    if (window.innerWidth < 768) return;
+    const heroPortrait = document.querySelector('.hero-portrait');
+    const heroSection = document.getElementById('hero');
+
+    if (heroPortrait && heroSection) {
+        heroSection.addEventListener('mousemove', (e) => {
+            const rect = heroSection.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+            heroPortrait.style.transform = `perspective(1000px) rotateY(${(x * 14).toFixed(2)}deg) rotateX(${(-y * 14).toFixed(2)}deg) translateZ(12px)`;
+        });
+
+        heroSection.addEventListener('mouseleave', () => {
+            heroPortrait.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) translateZ(0)';
+            heroPortrait.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        });
+
+        heroSection.addEventListener('mouseenter', () => {
+            heroPortrait.style.transition = 'none';
+        });
+    }
+}
+
 // Initialize 3D Engine on window load
 window.addEventListener('DOMContentLoaded', () => {
     initThreeScene();
+    initCard3DTilt();
+    initHero3DParallax();
 });
