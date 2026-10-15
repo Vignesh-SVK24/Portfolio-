@@ -212,3 +212,416 @@ document.querySelectorAll('a[target="_blank"]').forEach(link => {
         link.setAttribute('rel', 'noopener noreferrer');
     }
 });
+
+// ==========================================
+// ===== 3D GRAPHICS & THREE.JS ENGINE =====
+// ==========================================
+
+function initThreeScene() {
+    const canvas = document.getElementById('bg-3d-canvas');
+    if (!canvas || typeof THREE === 'undefined') return;
+
+    // --- Scene, Camera & Renderer ---
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 3500);
+    camera.position.z = 650;
+
+    const renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        alpha: true,
+        antialias: true,
+        powerPreference: 'high-performance'
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // --- Dynamic 3D Lights ---
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+    scene.add(ambientLight);
+
+    const cyanLight = new THREE.PointLight(0x00f2fe, 3.2, 1600);
+    cyanLight.position.set(300, 250, 400);
+    scene.add(cyanLight);
+
+    const goldLight = new THREE.PointLight(0xd4af37, 2.5, 1400);
+    goldLight.position.set(-350, -150, 350);
+    scene.add(goldLight);
+
+    const purpleLight = new THREE.PointLight(0x9d4edd, 2.2, 1600);
+    purpleLight.position.set(0, -600, 450);
+    scene.add(purpleLight);
+
+    // --- 3D Particle Starfield & Cyber Dust ---
+    const isMobile = window.innerWidth < 768;
+    const particleCount = isMobile ? 650 : 1300;
+    const particleGeo = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    const particleData = [];
+
+    const colorPalette = [
+        new THREE.Color(0x8ecae6), // Ice blue
+        new THREE.Color(0x00f2fe), // Electric Cyan
+        new THREE.Color(0xd4af37), // Celestial Gold
+        new THREE.Color(0x9d4edd), // Neon Purple
+        new THREE.Color(0xffffff)  // Pure Starlight
+    ];
+
+    for (let i = 0; i < particleCount; i++) {
+        const x = (Math.random() - 0.5) * 2400;
+        const y = (Math.random() - 0.5) * 3800;
+        const z = (Math.random() - 0.5) * 1600;
+        positions[i * 3] = x;
+        positions[i * 3 + 1] = y;
+        positions[i * 3 + 2] = z;
+
+        particleData.push({
+            originX: x,
+            originY: y,
+            originZ: z,
+            speed: 0.2 + Math.random() * 0.7,
+            phase: Math.random() * Math.PI * 2,
+            radius: 12 + Math.random() * 32
+        });
+
+        const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+        colors[i * 3] = color.r;
+        colors[i * 3 + 1] = color.g;
+        colors[i * 3 + 2] = color.b;
+    }
+
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    // Dynamic glowing circular particle texture
+    const pCanvas = document.createElement('canvas');
+    pCanvas.width = 32;
+    pCanvas.height = 32;
+    const pCtx = pCanvas.getContext('2d');
+    const radGrad = pCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
+    radGrad.addColorStop(0, 'rgba(255,255,255,1)');
+    radGrad.addColorStop(0.3, 'rgba(142,202,230,0.85)');
+    radGrad.addColorStop(0.7, 'rgba(0,242,254,0.3)');
+    radGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    pCtx.fillStyle = radGrad;
+    pCtx.beginPath();
+    pCtx.arc(16, 16, 16, 0, Math.PI * 2);
+    pCtx.fill();
+    const particleTex = new THREE.CanvasTexture(pCanvas);
+
+    const particleMat = new THREE.PointsMaterial({
+        size: isMobile ? 4.0 : 5.5,
+        map: particleTex,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+    });
+
+    const starParticles = new THREE.Points(particleGeo, particleMat);
+    scene.add(starParticles);
+
+    // --- 3D Geometric Polyhedra & Floating Crystals ---
+    const floatingObjects = [];
+
+    // 1. Hero Holographic Core (Icosahedron + Octahedron + Ring)
+    const heroCoreGroup = new THREE.Group();
+    heroCoreGroup.position.set(isMobile ? 0 : 270, 60, 40);
+
+    const outerIcosaGeo = new THREE.IcosahedronGeometry(isMobile ? 70 : 95, 1);
+    const outerIcosaMat = new THREE.MeshStandardMaterial({
+        color: 0x8ecae6,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.45,
+        roughness: 0.2,
+        metalness: 0.85
+    });
+    const outerIcosa = new THREE.Mesh(outerIcosaGeo, outerIcosaMat);
+    heroCoreGroup.add(outerIcosa);
+
+    const innerOctaGeo = new THREE.OctahedronGeometry(isMobile ? 42 : 55, 0);
+    const innerOctaMat = new THREE.MeshStandardMaterial({
+        color: 0xd4af37,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.65,
+        roughness: 0.3,
+        metalness: 0.9
+    });
+    const innerOcta = new THREE.Mesh(innerOctaGeo, innerOctaMat);
+    heroCoreGroup.add(innerOcta);
+
+    const ringGeo = new THREE.TorusGeometry(isMobile ? 95 : 130, 1.2, 16, 100);
+    const ringMat = new THREE.MeshBasicMaterial({
+        color: 0x00f2fe,
+        transparent: true,
+        opacity: 0.35
+    });
+    const orbitalRing = new THREE.Mesh(ringGeo, ringMat);
+    orbitalRing.rotation.x = Math.PI / 3;
+    heroCoreGroup.add(orbitalRing);
+
+    scene.add(heroCoreGroup);
+    floatingObjects.push({ mesh: heroCoreGroup, rotX: 0.005, rotY: 0.008, rotZ: 0.002, baseY: 60 });
+
+    // 2. About Section: Dodecahedron
+    const dodecaGeo = new THREE.DodecahedronGeometry(60, 0);
+    const dodecaMat = new THREE.MeshStandardMaterial({
+        color: 0x00f2fe,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.4
+    });
+    const dodeca = new THREE.Mesh(dodecaGeo, dodecaMat);
+    dodeca.position.set(-360, -550, 60);
+    scene.add(dodeca);
+    floatingObjects.push({ mesh: dodeca, rotX: 0.006, rotY: 0.009, rotZ: 0.004, baseY: -550 });
+
+    // 3. Projects Section: Torus Knot
+    const knotGeo = new THREE.TorusKnotGeometry(55, 12, 100, 16);
+    const knotMat = new THREE.MeshStandardMaterial({
+        color: 0x9d4edd,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.42
+    });
+    const knot = new THREE.Mesh(knotGeo, knotMat);
+    knot.position.set(380, -1250, 40);
+    scene.add(knot);
+    floatingObjects.push({ mesh: knot, rotX: 0.007, rotY: 0.005, rotZ: 0.003, baseY: -1250 });
+
+    // 4. Background Section: Octahedron
+    const octGeo2 = new THREE.OctahedronGeometry(50, 0);
+    const octMat2 = new THREE.MeshStandardMaterial({
+        color: 0xd4af37,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.5
+    });
+    const oct2 = new THREE.Mesh(octGeo2, octMat2);
+    oct2.position.set(-320, -1900, 50);
+    scene.add(oct2);
+    floatingObjects.push({ mesh: oct2, rotX: 0.008, rotY: 0.006, rotZ: 0.005, baseY: -1900 });
+
+    // 5. Contact Section: Floating Tetrahedron
+    const tetraGeo = new THREE.TetrahedronGeometry(45, 0);
+    const tetraMat = new THREE.MeshStandardMaterial({
+        color: 0x8ecae6,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.45
+    });
+    const tetra = new THREE.Mesh(tetraGeo, tetraMat);
+    tetra.position.set(300, -2600, 70);
+    scene.add(tetra);
+    floatingObjects.push({ mesh: tetra, rotX: 0.009, rotY: 0.007, rotZ: 0.004, baseY: -2600 });
+
+    // --- Interactive 3D Click Shockwave System ---
+    const shockwaves = [];
+    window.addEventListener('click', (e) => {
+        const mouseNormX = (e.clientX / window.innerWidth) * 2 - 1;
+        const mouseNormY = -(e.clientY / window.innerHeight) * 2 + 1;
+
+        const shockCount = 36;
+        const shockGeo = new THREE.BufferGeometry();
+        const shockPos = new Float32Array(shockCount * 3);
+        const velocities = [];
+
+        const clickWorldX = mouseNormX * (camera.position.z * Math.tan(camera.fov * Math.PI / 360)) * camera.aspect;
+        const clickWorldY = camera.position.y + mouseNormY * (camera.position.z * Math.tan(camera.fov * Math.PI / 360));
+
+        for (let i = 0; i < shockCount; i++) {
+            shockPos[i * 3] = clickWorldX;
+            shockPos[i * 3 + 1] = clickWorldY;
+            shockPos[i * 3 + 2] = 200;
+
+            const angle = (i / shockCount) * Math.PI * 2;
+            const speed = 4 + Math.random() * 3;
+            velocities.push({
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                vz: (Math.random() - 0.5) * 2
+            });
+        }
+
+        shockGeo.setAttribute('position', new THREE.BufferAttribute(shockPos, 3));
+        const shockMat = new THREE.PointsMaterial({
+            size: 6.0,
+            map: particleTex,
+            color: new THREE.Color(0x00f2fe),
+            transparent: true,
+            opacity: 1.0,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const shockPoints = new THREE.Points(shockGeo, shockMat);
+        scene.add(shockPoints);
+        shockwaves.push({ points: shockPoints, velocities, age: 0, maxAge: 45 });
+    });
+
+    // --- Mouse Parallax & Scroll Physics ---
+    let targetMouseX = 0, targetMouseY = 0;
+    let smoothMouseX = 0, smoothMouseY = 0;
+
+    window.addEventListener('mousemove', (e) => {
+        targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
+        targetMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    window.addEventListener('touchmove', (e) => {
+        if (e.touches.length > 0) {
+            targetMouseX = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+            targetMouseY = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+        }
+    }, { passive: true });
+
+    // Handle Window Resizing
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Pause when tab is inactive to save battery
+    let isPageVisible = true;
+    document.addEventListener('visibilitychange', () => {
+        isPageVisible = !document.hidden;
+    });
+
+    // --- Animation Loop ---
+    let clock = new THREE.Clock();
+
+    function render3D() {
+        requestAnimationFrame(render3D);
+        if (!isPageVisible) return;
+
+        const elapsedTime = clock.getElapsedTime();
+
+        // Smooth mouse damping
+        smoothMouseX += (targetMouseX - smoothMouseX) * 0.05;
+        smoothMouseY += (targetMouseY - smoothMouseY) * 0.05;
+
+        // Camera scroll & mouse parallax
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollFrac = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+        const targetCamY = -scrollFrac * 2700;
+
+        camera.position.x += (smoothMouseX * 120 - camera.position.x) * 0.05;
+        camera.position.y += (targetCamY + smoothMouseY * 80 - camera.position.y) * 0.06;
+        camera.rotation.y = -smoothMouseX * 0.08;
+        camera.rotation.x = smoothMouseY * 0.08;
+
+        // Update star particles (gentle drift and oscillation)
+        const posAttr = starParticles.geometry.attributes.position;
+        const posArray = posAttr.array;
+        for (let i = 0; i < particleCount; i++) {
+            const data = particleData[i];
+            posArray[i * 3 + 1] = data.originY + Math.sin(elapsedTime * data.speed + data.phase) * data.radius;
+            posArray[i * 3] = data.originX + Math.cos(elapsedTime * (data.speed * 0.5) + data.phase) * (data.radius * 0.5);
+        }
+        posAttr.needsUpdate = true;
+        starParticles.rotation.y = elapsedTime * 0.015;
+
+        // Rotate & bob floating 3D polyhedra
+        floatingObjects.forEach((obj, idx) => {
+            obj.mesh.rotation.x += obj.rotX;
+            obj.mesh.rotation.y += obj.rotY;
+            obj.mesh.rotation.z += obj.rotZ;
+            obj.mesh.position.y = obj.baseY + Math.sin(elapsedTime * 1.5 + idx) * 18;
+        });
+
+        // Orbit Hero ring specifically
+        orbitalRing.rotation.z += 0.012;
+        innerOcta.rotation.x -= 0.01;
+        innerOcta.rotation.y -= 0.012;
+
+        // Update shockwaves
+        for (let s = shockwaves.length - 1; s >= 0; s--) {
+            const sw = shockwaves[s];
+            sw.age++;
+            const sPos = sw.points.geometry.attributes.position.array;
+            for (let p = 0; p < sw.velocities.length; p++) {
+                sPos[p * 3] += sw.velocities[p].vx;
+                sPos[p * 3 + 1] += sw.velocities[p].vy;
+                sPos[p * 3 + 2] += sw.velocities[p].vz;
+            }
+            sw.points.geometry.attributes.position.needsUpdate = true;
+            sw.points.material.opacity = 1 - (sw.age / sw.maxAge);
+
+            if (sw.age >= sw.maxAge) {
+                scene.remove(sw.points);
+                sw.points.geometry.dispose();
+                sw.points.material.dispose();
+                shockwaves.splice(s, 1);
+            }
+        }
+
+        // Move light positions slightly for dynamic specular shifts
+        cyanLight.position.x = Math.sin(elapsedTime * 0.7) * 350 + 200;
+        cyanLight.position.y = Math.cos(elapsedTime * 0.5) * 200 + camera.position.y;
+        goldLight.position.y = camera.position.y - 200 + Math.sin(elapsedTime * 0.6) * 150;
+
+        renderer.render(scene, camera);
+    }
+
+    render3D();
+}
+
+// ==========================================
+// ===== 3D CARD TILT & GLARE PHYSICS =====
+// ==========================================
+
+function init3DCardTilt() {
+    const tiltElements = document.querySelectorAll('.project-card, .work-card, .hero-portrait, .image-frame, .stat-item, .contact-item');
+    if (!tiltElements.length) return;
+
+    tiltElements.forEach(card => {
+        // Inject 3D glare highlight if not present
+        if (!card.querySelector('.card-glare') && (card.classList.contains('project-card') || card.classList.contains('work-card'))) {
+            const glare = document.createElement('div');
+            glare.className = 'card-glare';
+            card.appendChild(glare);
+        }
+
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = ((y - centerY) / centerY) * -12; // Max 12 deg tilt
+            const rotateY = ((x - centerX) / centerX) * 12;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.03, 1.03, 1.03)`;
+
+            // Update glare position
+            const glare = card.querySelector('.card-glare');
+            if (glare) {
+                const glareX = (x / rect.width) * 100;
+                const glareY = (y / rect.height) * 100;
+                card.style.setProperty('--glare-x', `${glareX}%`);
+                card.style.setProperty('--glare-y', `${glareY}%`);
+            }
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+            card.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        });
+
+        card.addEventListener('mouseenter', () => {
+            card.style.transition = 'transform 0.15s ease-out';
+        });
+    });
+}
+
+// Initialize 3D Engine on window load
+window.addEventListener('DOMContentLoaded', () => {
+    initThreeScene();
+    init3DCardTilt();
+});
