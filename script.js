@@ -539,9 +539,251 @@ function initHero3DParallax() {
     }
 }
 
+// ===== BABYLON.JS 3D INTERACTIVE LAB ENGINE =====
+function initBabylonLab() {
+    const canvas = document.getElementById('babylon-canvas');
+    if (!canvas || typeof BABYLON === 'undefined') return;
+
+    try {
+        const engine = new BABYLON.Engine(canvas, true, {
+            preserveDrawingBuffer: true,
+            stencil: true,
+            adaptToDeviceRatio: true
+        });
+
+        const scene = new BABYLON.Scene(engine);
+        scene.clearColor = new BABYLON.Color4(0.03, 0.04, 0.07, 0.95);
+
+        // ArcRotateCamera for intuitive 3D Orbiting
+        const camera = new BABYLON.ArcRotateCamera(
+            'labCam',
+            -Math.PI / 2,
+            Math.PI / 2.5,
+            5.2,
+            BABYLON.Vector3.Zero(),
+            scene
+        );
+        camera.attachControl(canvas, true);
+        camera.lowerRadiusLimit = 3.0;
+        camera.upperRadiusLimit = 8.5;
+        camera.wheelPrecision = 40;
+        camera.pinchPrecision = 40;
+        camera.useAutoRotationBehavior = false;
+
+        // Dynamic 3D Lights
+        const hemiLight = new BABYLON.HemisphericLight('labHemi', new BABYLON.Vector3(0, 1, 0), scene);
+        hemiLight.intensity = 0.65;
+        hemiLight.groundColor = new BABYLON.Color3(0.04, 0.08, 0.15);
+
+        const keyLight = new BABYLON.PointLight('labKey', new BABYLON.Vector3(3.5, 4, 3), scene);
+        keyLight.intensity = 1.5;
+
+        const fillLight = new BABYLON.PointLight('labFill', new BABYLON.Vector3(-3.5, -2, -3), scene);
+        fillLight.intensity = 0.8;
+
+        // Palette presets
+        const colorPresets = {
+            cyan: new BABYLON.Color3(0, 0.95, 1.0),
+            gold: new BABYLON.Color3(0.9, 0.72, 0.2),
+            purple: new BABYLON.Color3(0.78, 0.18, 0.95),
+            emerald: new BABYLON.Color3(0.05, 0.95, 0.65)
+        };
+
+        let activeColor = colorPresets.cyan;
+        let currentGeoType = 'sphere';
+        let currentMatType = 'glow';
+        let isSpinning = true;
+
+        // Core Material
+        const coreMaterial = new BABYLON.StandardMaterial('coreMat', scene);
+
+        function updateMaterial() {
+            keyLight.diffuse = activeColor;
+            fillLight.diffuse = activeColor.scale(0.6);
+
+            if (currentMatType === 'glow') {
+                coreMaterial.diffuseColor = activeColor.scale(0.35);
+                coreMaterial.emissiveColor = activeColor.scale(0.75);
+                coreMaterial.specularColor = new BABYLON.Color3(1, 1, 1);
+                coreMaterial.specularPower = 32;
+                coreMaterial.wireframe = false;
+                coreMaterial.alpha = 0.88;
+            } else if (currentMatType === 'wireframe') {
+                coreMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+                coreMaterial.emissiveColor = activeColor;
+                coreMaterial.wireframe = true;
+                coreMaterial.alpha = 0.95;
+            } else if (currentMatType === 'metallic') {
+                coreMaterial.diffuseColor = new BABYLON.Color3(0.85, 0.88, 0.92);
+                coreMaterial.emissiveColor = activeColor.scale(0.18);
+                coreMaterial.specularColor = new BABYLON.Color3(1, 1, 1);
+                coreMaterial.specularPower = 90;
+                coreMaterial.wireframe = false;
+                coreMaterial.alpha = 1.0;
+            }
+
+            if (ringMat1) ringMat1.emissiveColor = activeColor;
+            if (satelliteMat) satelliteMat.emissiveColor = activeColor;
+        }
+
+        // Geometry Builder
+        let coreMesh = null;
+        function buildCoreMesh(type) {
+            if (coreMesh) coreMesh.dispose();
+
+            if (type === 'sphere') {
+                coreMesh = BABYLON.MeshBuilder.CreateIcoSphere('core', { radius: 1.25, subdivisions: 3 }, scene);
+            } else if (type === 'torus') {
+                coreMesh = BABYLON.MeshBuilder.CreateTorusKnot('core', {
+                    radius: 0.95,
+                    tube: 0.28,
+                    radialSegments: 96,
+                    tubularSegments: 32,
+                    p: 2,
+                    q: 3
+                }, scene);
+            } else if (type === 'crystal') {
+                coreMesh = BABYLON.MeshBuilder.CreatePolyhedron('core', { type: 1, size: 1.2 }, scene);
+            }
+
+            coreMesh.material = coreMaterial;
+        }
+
+        // Outer Gyroscope Rings
+        const ring1 = BABYLON.MeshBuilder.CreateTorus('ring1', { diameter: 3.4, thickness: 0.045, tessellation: 64 }, scene);
+        const ringMat1 = new BABYLON.StandardMaterial('ringMat1', scene);
+        ringMat1.wireframe = true;
+        ring1.material = ringMat1;
+
+        const ring2 = BABYLON.MeshBuilder.CreateTorus('ring2', { diameter: 4.1, thickness: 0.035, tessellation: 64 }, scene);
+        const ringMat2 = new BABYLON.StandardMaterial('ringMat2', scene);
+        ringMat2.emissiveColor = new BABYLON.Color3(0.83, 0.68, 0.21);
+        ringMat2.wireframe = true;
+        ring2.material = ringMat2;
+        ring2.rotation.x = Math.PI / 3;
+
+        // Orbiting Satellite Node
+        const satellite = BABYLON.MeshBuilder.CreateSphere('sat', { diameter: 0.25 }, scene);
+        const satelliteMat = new BABYLON.StandardMaterial('satMat', scene);
+        satellite.material = satelliteMat;
+
+        // Initial setup
+        updateMaterial();
+        buildCoreMesh(currentGeoType);
+
+        // UI Event Listeners
+        // 1. Geometry buttons
+        document.querySelectorAll('#geo-controls .lab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#geo-controls .lab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentGeoType = btn.dataset.geo;
+                buildCoreMesh(currentGeoType);
+            });
+        });
+
+        // 2. Material buttons
+        document.querySelectorAll('#mat-controls .lab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#mat-controls .lab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMatType = btn.dataset.mat;
+                updateMaterial();
+            });
+        });
+
+        // 3. Color Picker buttons
+        document.querySelectorAll('#color-controls .color-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#color-controls .color-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const colName = btn.dataset.color;
+                if (colorPresets[colName]) {
+                    activeColor = colorPresets[colName];
+                    updateMaterial();
+                }
+            });
+        });
+
+        // 4. Toggle Rotation
+        const toggleBtn = document.getElementById('btn-toggle-spin');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                isSpinning = !isSpinning;
+                toggleBtn.querySelector('span').textContent = isSpinning ? 'Pause Rotation' : 'Resume Rotation';
+                toggleBtn.querySelector('i').className = isSpinning ? 'fas fa-pause' : 'fas fa-play';
+            });
+        }
+
+        // 5. Pulse Energy action
+        const pulseBtn = document.getElementById('btn-pulse-core');
+        let pulseTimer = 0;
+        let isPulsing = false;
+        if (pulseBtn) {
+            pulseBtn.addEventListener('click', () => {
+                isPulsing = true;
+                pulseTimer = 0;
+            });
+        }
+
+        // FPS display updater
+        const fpsElem = document.getElementById('fps-display');
+        let fpsCounter = 0;
+
+        // Render Loop
+        let time = 0;
+        engine.runRenderLoop(() => {
+            time += 0.015;
+
+            if (isSpinning) {
+                if (coreMesh) {
+                    coreMesh.rotation.y += 0.008;
+                    coreMesh.rotation.x += 0.004;
+                }
+                ring1.rotation.y += 0.012;
+                ring1.rotation.x += 0.006;
+                ring2.rotation.y -= 0.01;
+                ring2.rotation.z += 0.008;
+            }
+
+            // Orbiting satellite path
+            satellite.position.x = Math.cos(time * 1.5) * 2.2;
+            satellite.position.z = Math.sin(time * 1.5) * 2.2;
+            satellite.position.y = Math.sin(time * 2.0) * 0.8;
+
+            // Pulse effect animation
+            if (isPulsing && coreMesh) {
+                pulseTimer += 0.08;
+                const scale = 1 + Math.sin(pulseTimer) * 0.25;
+                coreMesh.scaling.set(scale, scale, scale);
+                if (pulseTimer >= Math.PI) {
+                    isPulsing = false;
+                    coreMesh.scaling.set(1, 1, 1);
+                }
+            }
+
+            scene.render();
+
+            fpsCounter++;
+            if (fpsCounter % 40 === 0 && fpsElem) {
+                fpsElem.textContent = engine.getFps().toFixed(0) + ' FPS';
+            }
+        });
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            engine.resize();
+        });
+
+    } catch (err) {
+        console.warn('Babylon.js initialization skipped:', err);
+    }
+}
+
 // Initialize 3D Engine on window load
 window.addEventListener('DOMContentLoaded', () => {
     initThreeScene();
+    initBabylonLab();
     initCard3DTilt();
     initHero3DParallax();
 });
