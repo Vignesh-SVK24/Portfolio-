@@ -634,7 +634,7 @@ img { max-width: 100%; display: block; }
     .about-stats { justify-content: center; }
     .about-image { order: -1; }
     .projects-grid { grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
-    .more-work-grid { grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
+    .more-work-grid { grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
     .contact-grid { grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
     .cursor, .cursor-follower { display: none; }
     body { cursor: auto; }
@@ -649,10 +649,73 @@ img { max-width: 100%; display: block; }
     .hero-title { font-size: 2.5rem; }
     .title-line { font-size: clamp(2.2rem, 8vw, 3.2rem); letter-spacing: 0.1em; }
     .section-title { font-size: 1.85rem; margin-bottom: 1.8rem; }
-    .projects-grid, .more-work-grid, .contact-grid {
+    .projects-grid, .contact-grid {
         grid-template-columns: 1fr;
         gap: 1.25rem;
     }
+
+    /* "My Work" Section: Exactly 3 columns on mobile with auto-flowing rows */
+    .more-work-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 0.65rem;
+    }
+    .work-card {
+        padding: 0.85rem 0.35rem;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+    }
+    .work-image {
+        width: clamp(52px, 16vw, 75px);
+        height: clamp(52px, 16vw, 75px);
+        margin: 0 auto 0.5rem;
+        border-width: 1.5px;
+    }
+    .work-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+        flex-grow: 1;
+    }
+    .work-info h4 {
+        font-size: clamp(0.72rem, 2.4vw, 0.85rem);
+        line-height: 1.25;
+        margin-bottom: 0.2rem;
+        font-weight: 700;
+        word-break: break-word;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .work-info p {
+        font-size: clamp(0.62rem, 2vw, 0.72rem);
+        line-height: 1.2;
+        margin-bottom: 0.45rem;
+        color: rgba(255, 255, 255, 0.7);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .work-link {
+        font-size: clamp(0.64rem, 2.1vw, 0.74rem);
+        padding: 0.22rem 0.55rem;
+        border-radius: 12px;
+        background: rgba(142, 202, 230, 0.12);
+        border: 1px solid rgba(142, 202, 230, 0.25);
+        margin-top: auto;
+        gap: 0.25rem;
+    }
+    .work-link i {
+        font-size: 0.62rem;
+    }
+
     .timeline { padding-left: 2.4rem; }
     .timeline-icon { left: -3.2rem; width: 32px; height: 32px; font-size: 0.85rem; }
     .timeline-item { padding: 1.25rem 1.4rem; }
@@ -662,11 +725,40 @@ img { max-width: 100%; display: block; }
 /* Small Phones <= 480px */
 @media (max-width: 480px) {
     html { font-size: 14.5px; }
-    .container { padding: 0 1rem; }
+    .container { padding: 0 0.85rem; }
     .hero-portrait { width: 200px; height: 260px; }
     .title-line { letter-spacing: 0.08em; }
     .image-frame { width: 220px; height: 280px; }
-    .work-image { width: 130px; height: 130px; }
+
+    /* "My Work" 3 columns on small phones */
+    .more-work-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 0.45rem;
+    }
+    .work-card {
+        padding: 0.65rem 0.25rem;
+        border-radius: 10px;
+    }
+    .work-image {
+        width: clamp(46px, 14vw, 58px);
+        height: clamp(46px, 14vw, 58px);
+        margin-bottom: 0.35rem;
+    }
+    .work-info h4 {
+        font-size: 0.72rem;
+        line-height: 1.2;
+    }
+    .work-info p {
+        font-size: 0.62rem;
+        line-height: 1.15;
+        margin-bottom: 0.35rem;
+    }
+    .work-link {
+        font-size: 0.62rem;
+        padding: 0.18rem 0.42rem;
+        gap: 0.2rem;
+    }
+
     .collab-btn { width: 100%; justify-content: center; }
     .about-stats { flex-direction: column; gap: 1.2rem; }
 }
